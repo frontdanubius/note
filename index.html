@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sticky Notes</title>
+  <style>
+    body {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 20px;
+    }
+
+    .note {
+      position: relative;
+      width: 200px;
+      height: 150px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div id="notes-container"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const notesContainer = document.getElementById('notes-container');
+
+  // Load existing notes from localStorage
+  const savedNotes = JSON.parse(localStorage.getItem('notes')) || [];
+
+  // Render existing notes
+  savedNotes.forEach(note => {
+    createNoteElement(note);
+  });
+
+  function createNoteElement(noteText) {
+    const noteElement = document.createElement('div');
+    noteElement.className = 'note';
+
+    const deleteBtn = document.createElement('span');
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.innerHTML = '&times;';
+
+    deleteBtn.addEventListener('click', () => {
+      // Remove the note from the array and update localStorage
+      const index = savedNotes.indexOf(noteText);
+      if (index !== -1) {
+        savedNotes.splice(index, 1);
+        localStorage.setItem('notes', JSON.stringify(savedNotes));
+      }
+
+      // Remove the note element from the DOM
+      notesContainer.removeChild(noteElement);
+    });
+
+    noteElement.textContent = noteText;
+    noteElement.appendChild(deleteBtn);
+    notesContainer.appendChild(noteElement);
+  }
+
+  function addNote() {
+    const noteText = prompt('Enter your note:');
+    if (noteText) {
+      // Save the note to localStorage
+      savedNotes.push(noteText);
+      localStorage.setItem('notes', JSON.stringify(savedNotes));
+
+      // Create and render the new note element
+      createNoteElement(noteText);
+    }
+  }
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'n' && event.ctrlKey) {
+      addNote();
+    }
+  });
+});
+</script>
+
+</body>
+</html>
